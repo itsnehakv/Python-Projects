@@ -10,24 +10,23 @@ class QuizBrain:
     def still_has_questions(self):
         return self.question_number < len(self.question_list)
 
+    #----Fetching next question----
     def next_question(self):
         if self.question_number>=len(self.question_list):
             return False
         self.current_question = self.question_list[self.question_number]
         self.question_number += 1
-        self.q_text=html.unescape(self.current_question.text)  #unescapes the html entities
+        self.q_text=html.unescape(self.current_question.text)  
         return f"Q.{self.question_number}: {self.q_text}"
-        # self.check_answer(user_answer)
-
+        
+    #----Checking answer-----
     def check_answer(self, user_answer):
         correct_answer = self.current_question.answer
         if user_answer.lower() == correct_answer.lower():
             self.score+=1
-            print("You got it right!")
             print(f"{len(self.question_list)}")
             print(f"{self.question_number}")
             return True
         else:
-            print("That's wrong.")
             return False
 
