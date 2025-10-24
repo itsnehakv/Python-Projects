@@ -1,0 +1,101 @@
+****LOGIC OF STOPS IN flight_data.py****
+sample data={
+  "data": [
+    {
+     ...........
+     ...........
+      "itineraries": [
+        {
+          "duration": "PT14H15M",
+          "segments": [
+          ****SEGMENT 1****
+            {
+              "departure": {
+                "iataCode": "SYD",
+                "terminal": "1",
+                "at": "2021-11-01T11:35:00"
+              },
+              "arrival": {
+                "iataCode": "MNL",
+                "terminal": "2",
+                "at": "2021-11-01T16:50:00"
+              },
+              "carrierCode": "PR",
+              "number": "212",
+              "aircraft": {
+                "code": "333"
+              },
+              "operating": {
+                "carrierCode": "PR"
+              },
+              "duration": "PT8H15M",
+              "id": "1",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            },
+
+            ***SEGMENT 2****
+            {
+              "departure": {
+                "iataCode": "MNL",
+                "terminal": "1",
+                "at": "2021-11-01T19:20:00"
+              },
+              "arrival": {
+                "iataCode": "BKK",
+                "at": "2021-11-01T21:50:00"
+              },
+              "carrierCode": "PR",
+              "number": "732",
+              "aircraft": {
+                "code": "320"
+              },
+              "operating": {
+                "carrierCode": "PR"
+              },
+              "duration": "PT3H30M",
+              "id": "2",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+
+
+1 segment = a direct (non-stop) flight.
+2 segments = 1 stopover.
+3 or more segments = multiple stops
+
+Here, there are 2 segments, therefore one stop (@ MNL)
+
+no_of_stops=len(no. of segments -1)
+no_of_stops=2-1 = 1 stop
+
+The departure data (code & date) would always be the first ele of the segment ([0])
+
+arrival_code=first_flight_data["itineraries"][0]["segments"][no_of_stops]["arrival"]["iataCode"]
+arrival_date=first_flight_data["itineraries"][1]["segments"][-1]["arrival"]["at"].split("T")[0]
+Here, [no_of_stops] and [-1] both would return the last segment
+
+One-way flight → Only one itinerary (outbound only)
+Round-trip flight → Two itineraries (one outbound, one return)
+
+Q.Why is arrival code-->itineraries[0] but arrival date-->itineraries[1]
+A.
+ For a round trip flight---->
+first_flight_data["itineraries"] = [
+    {  # [0] Outbound flight (e.g. SYD → BKK)
+        "segments": [...]
+    },
+    {  # [1] Return flight (e.g. BKK → SYD)
+        "segments": [...]
+    }
+]
+*You're looking at the arrival airport of the last segment of the outbound flight.
+*itineraries[0] → the outbound journey.
+*segments[no_of_stops] → the last segment (e.g. a direct or connecting flight)
+
+*You're looking at the arrival date of the last segment of the return trip.
+*itineraries[1] → the return journey.
+*segments[-1] → the last leg of the return trip.
+
+iti[0] SYD---->MNL       iti[1] MNL--->SYD  #round trip
+therefore, dest wil be in iti[0] but arrival_date(which is basically the date till when you can book flight) will
+be in iti[1]
